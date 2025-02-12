@@ -12,10 +12,23 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
             height: 100vh;
-            background-color: #f4f4f4;
+            background-color: #f8f8f8;
             box-sizing: border-box;
         }
+
+        .banner {
+            width: 100%;
+            background: #b30000;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .banner img {
+            height: 50px;
+        }
+
         .container {
             background: white;
             padding: 20px;
@@ -26,30 +39,84 @@
             max-width: 400px;
             box-sizing: border-box;
         }
-        select, button {
+
+        .container h2 {
+            color: #b30000;
+        }
+
+        .radio-group {
+            text-align: left;
+            margin: 15px 0;
+        }
+
+        .radio-group label {
+            display: block;
+            padding: 8px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .radio-group input[type="radio"] {
+            display: none;
+        }
+
+        .radio-group label:hover {
+            background: #eee;
+        }
+
+        .radio-group input[type="radio"]:checked + label {
+            background: #b30000;
+            color: white;
+            border-color: #b30000;
+        }
+
+        button {
             width: 100%;
             padding: 12px;
             margin-top: 12px;
-            border: 1px solid #ccc;
+            border: none;
             border-radius: 5px;
             font-size: 16px;
-        }
-        button {
-            background-color: #007bff;
+            background-color: #b30000;
             color: white;
-            border: none;
             cursor: pointer;
+            transition: 0.3s;
         }
+
         button:hover {
-            background-color: #0056b3;
+            background-color: #800000;
         }
-        /* Estilos Responsivos para dispositivos móveis */
+
+        .info-box {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #333;
+            text-align: left;
+        }
+
+        .footer {
+            margin-top: 20px;
+            padding: 10px;
+            background: #333;
+            color: white;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 15px;
                 width: 95%;
             }
-            select, button {
+            button {
                 font-size: 14px;
             }
         }
@@ -57,35 +124,81 @@
 </head>
 <body>
 
+    <!-- Banner com Logo -->
+    <div class="banner">
+        <img src="logo.png" alt="SafeZone">
+    </div>
+
     <div class="container">
         <h2>Selecione um Evento</h2>
-        <select id="evento">
-            <option value="E15800000">Acidente de Trânsito</option>
-            <option value="E15900000">Roubo/Assalto</option>
-            <option value="E16000000">Furto</option>
-            <option value="E016100000">Situação Suspeita</option>
-            <option value="E01620000">Vandalismo</option>
-            <option value="E01630000">Agressão</option>
-            <option value="E01640000">Violência Doméstica</option>
-        </select>
+        <p><strong>Cliente:</strong> <span id="clienteNumero"></span></p>
+
+        <!-- Radio Buttons -->
+        <div class="radio-group">
+            <input type="radio" id="evento1" name="evento" value="E15800000">
+            <label for="evento1">Acidente de Trânsito</label>
+
+            <input type="radio" id="evento2" name="evento" value="E15900000">
+            <label for="evento2">Roubo/Assalto</label>
+
+            <input type="radio" id="evento3" name="evento" value="E16000000">
+            <label for="evento3">Furto</label>
+
+            <input type="radio" id="evento4" name="evento" value="E16100000">
+            <label for="evento4">Situação Suspeita</label>
+
+            <input type="radio" id="evento5" name="evento" value="E16200000">
+            <label for="evento5">Vandalismo</label>
+
+            <input type="radio" id="evento6" name="evento" value="E16300000">
+            <label for="evento6">Agressão</label>
+
+            <input type="radio" id="evento7" name="evento" value="E16400000">
+            <label for="evento7">Violência Doméstica</label>
+        </div>
+
         <button id="confirmarButton">Confirmar Envio</button>
+
+        <!-- Informações -->
+        <div class="info-box">
+            <p><strong>Importante:</strong> Certifique-se de selecionar o evento correto antes de enviar.</p>
+        </div>
+    </div>
+
+    <!-- Rodapé -->
+    <div class="footer">
+        <p>© 2024 Nome da Empresa | Contato: contato@empresa.com | Telefone: (11) 9999-9999</p>
     </div>
 
     <script>
-        // Função para enviar o evento
-        function enviarEvento() {
-            const evento = document.getElementById("evento").value;
-            const cliente = "9999";
-            const url = `http://168.0.195.186:9115/${cliente}${evento}`;
+        // Função para pegar parâmetros da URL
+        function getParametro(nome) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(nome) || "9999"; // Se não houver parâmetro, usa "9999"
+        }
 
-            console.log("Enviando requisição para:", url); // Log para depuração
+        // Pegando o número do cliente e exibindo na página
+        const cliente = getParametro("cliente");
+        document.getElementById("clienteNumero").textContent = cliente;
+
+        function enviarEvento() {
+            const eventoSelecionado = document.querySelector('input[name="evento"]:checked');
+
+            if (!eventoSelecionado) {
+                alert("Por favor, selecione um evento.");
+                return;
+            }
+
+            const evento = eventoSelecionado.value;
+            const url = `/enviar_evento?evento=${evento}&cliente=${cliente}`; // Enviando o cliente
 
             fetch(url, { method: 'GET' })
-                .then(response => {
-                    if (response.ok) {
-                        alert("Evento enviado com sucesso!");
+                .then(response => response.json())
+                .then(data => {
+                    if (data.mensagem) {
+                        alert(data.mensagem);
                     } else {
-                        alert("Erro ao enviar evento.");
+                        alert("Erro: " + data.erro);
                     }
                 })
                 .catch(error => {
@@ -94,10 +207,8 @@
                 });
         }
 
-        // Eventos para a interação com o botão
         document.getElementById("confirmarButton").addEventListener('click', enviarEvento);
-        document.getElementById("confirmarButton").addEventListener('touchstart', enviarEvento); // Para toque em telas sensíveis
-
+        document.getElementById("confirmarButton").addEventListener('touchstart', enviarEvento);
     </script>
 
 </body>
